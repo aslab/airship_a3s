@@ -1,0 +1,7 @@
+#!/bin/sh
+trap "echo Terminate signal received. Exitting; exit" TERM
+echo "Container initialized"
+while true
+do
+  sleep 1
+done
