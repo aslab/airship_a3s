@@ -1,7 +1,6 @@
 FROM ros:humble-ros-core
 
 ARG USERNAME=oper
-ARG BUILD_WORKERS=4
 
 RUN apt-get update && apt-get upgrade -y && apt-get install -y sudo
 COPY --chmod=755 initcnt /usr/bin
@@ -16,10 +15,12 @@ RUN apt-get install -y git python3-colcon-core python3-colcon-bash python3-colco
     python3-colcon-parallel-executor python3-vcstool python3-rosdep
 # Micro-XRCE-DDS-Gen dependencies.
 RUN apt-get install -y default-jre
+# MAVROS dependencies.
+RUN apt-get install -y ros-humble-mavros
 
 USER $USERNAME
-RUN mkdir -p /home/$USERNAME/fms/rosws/src
-WORKDIR /home/$USERNAME/fms/rosws
+RUN mkdir -p /home/$USERNAME/fms/src
+WORKDIR /home/$USERNAME/fms
 
 # Ardupilot setup.
 RUN vcs import --recursive --input \
@@ -29,20 +30,24 @@ RUN AP_DOCKER_BUILD=1 SKIP_AP_EXT_ENV=1 SKIP_AP_GRAPHIC_ENV=1 SKIP_AP_COV_ENV=1 
     src/ardupilot/Tools/environment_install/install-prereqs-ubuntu.sh -y
 RUN sudo rosdep init && rosdep update && rosdep install --from-paths src --ignore-src -r -y
 
-# Micro-XRCE-DDS-Gen setup/
-WORKDIR /home/$USERNAME/fms/rosws/src
+# Micro-XRCE-DDS-Gen setup.
 RUN git clone --recurse-submodules --branch v4.7.0 \
-    https://github.com/ardupilot/Micro-XRCE-DDS-Gen.git
-WORKDIR /home/$USERNAME/fms/rosws/src/Micro-XRCE-DDS-Gen
+    https://github.com/ardupilot/Micro-XRCE-DDS-Gen.git src/Micro-XRCE-DDS-Gen
+WORKDIR /home/$USERNAME/fms/src/Micro-XRCE-DDS-Gen
 RUN ./gradlew assemble
-RUN echo "export PATH=\$PATH:/home/$USERNAME/fms/rosws/src/Micro-XRCE-DDS-Gen/scripts" >> \
+RUN echo "export PATH=\$PATH:/home/$USERNAME/fms/src/Micro-XRCE-DDS-Gen/scripts" >> \
     ~/.ardupilot_env
 
-# Build Ardupilot
-WORKDIR /home/$USERNAME/fms/rosws
-# RUN commands are executed from `/bin/sh -c`, which is /bin/dash. But we need /bin/bash to run
-# commands in the ROS environment.
-RUN /bin/bash -c "source /opt/ros/$ROS_DISTRO/setup.bash && source ~/.ardupilot_env && colcon build --parallel-workers $BUILD_WORKERS --packages-up-to ardupilot_dds_tests"
+# Build Ardupilot.
+WORKDIR /home/$USERNAME/fms
+# RUN commands are executed as `/bin/sh -c`, which in Ubuntu is /bin/dash. But we need /bin/bash
+# to run commands in the ROS environment.
+RUN /bin/bash -c "source /opt/ros/$ROS_DISTRO/setup.bash; \
+    source ~/.ardupilot_env; \
+    colcon build --packages-up-to ardupilot_dds_tests"
 
-# Cleanup
+# Install Geographic-lib datasets required by MAVROS.
+RUN sudo /opt/ros/humble/lib/mavros/install_geographiclib_datasets.sh
+
+# Cleanup.
 RUN sudo apt-get clean && sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

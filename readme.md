@@ -9,13 +9,13 @@ The environment used to develop, build and test the system is a container runnin
 The image used will be based on ROS2 Humble taken from the [OSRF Docker images][4]. Building [Ardupilot][5] for our use case.
 ```sh
 cd <project_directory>
-podman build --build-arg=BUILD_WORKERS=12 -t custom-ros-core:latest .
+podman build --cpuset-cpus=0-7 -t fms:latest .
 ```
-The `--build-arg=BUILD_WORKERS=12` will configure the build to use 12 parallel jobs to accelerate the compilation. The argument is optional and its value can be changed.
+The `--cpuset-cpus=0-7` is an optional argument to specify which CPUS speficially are allowed to to be used by the building process. This helps preventing resource starvation in intensive tasks such as the Ardupilot compilation.
 
 We will create an unprivileged, [rootless container][6]. For the moment, we will run a simple init program (`initcnt`) to keep the container available in the background.
 ```sh
-podman run -d --userns=keep-id -v ./vol:/mnt/vol:Z --hostname=fms --name fms localhost/custom-ros-core:latest initcnt
+podman run -d --userns=keep-id --cpuset-cpus=2-12 -v ./ros_pkg:/home/oper/fms/src/a3s:Z --hostname=fms --name fms_dev localhost/fms:latest initcnt
 podman ps  # Check that the created container is running.
 ```
 Note that to [enable the host-container volume to work with a host OS having SELinux labels for the directories][7] (such as Fedora) we have to append a `:Z` to the volume path.
@@ -26,60 +26,17 @@ podman exec -it -u root fms login oper  # Login as user "oper".
 ```
 We enter through `login` to initialize the environment as usual, that is, sourcing `~/.profile`, `~/.bashrc` etc. Still, all configuration is intended to place all the setup required in the `~/.bashrc` with the intention of allowing a simpler entrypoint.
 
-Testing Ardupilot and SITL
---------------------------
-Once the image has been build, you can test that Ardupilot is working correctly by running some tests.
+As this is currently a development environment, we are mounting the a3s project directory as a volume inside the container. Which means that now is the time the build it.
 ```sh
-oper@fms $ cd fms/rosws
+oper@fms $ cd fms
+oper@fms $ colcon build --packages-up-to a3s
 oper@fms $ source install/local_setup.bash
-oper@fms $ colcon test --executor sequential --base-paths src/ardupilot --event-handlers=console_direct+
-```
-
-To test that the SITL works, run the following.
-```sh
 oper@fms $ mkdir sims
 oper@fms $ cd sims
-oper@fms $ ln -s /mnt/vol/launchsim.sh launchsim.sh  # One-time setup.
-oper@fms $ ./launchsim.sh
+oper@fms $ ros2 launch a3s mission_launch.py
 ```
+You should then see the logs of the simulation starting, the ardupilot initializing and the mission manager providing waypoints and commanding the drone to takeoff.
 
-Open another terminal, enter the container, run mavproxy and command the aircraft to take off.
-```sh
-host $ podman exec -it -u root fms login oper
-oper@fms $ cd fms/rosws
-oper@fms $ source install/local_setup.bash
-oper@fms $ mavproxy.py --aircraft test --master=:14550
-MANUAL> mode guided
-GUIDED> arm throttle
-GUIDED> mode takeoff
-```
-You should see now that the aircraft is gaining height.
-
-Mission manager
-----------------
-Start the SITL.
-```sh
-oper@fms $ cd fms/rosws
-oper@fms $ source install/local_setup.bash
-oper@fms $ cd sims
-oper@fms $ ./launchsim.sh
-```
-
-Start MAVROS in another terminal.
-```sh
-oper@fms $ cd fms/rosws
-oper@fms $ source install/local_setup.bash
-oper@fms $ ros2 run mavros mavros_node --ros-args -p fcu_url:="udp://0.0.0.0:14550@" -p target_system_id:=1 -p target_component_id:=1
-```
-
-Start mission manager in another terminal too.
-```sh
-oper@fms $ cd fms/rosws
-oper@fms $ source install/local_setup.bash
-oper@fms $ cd sims
-oper@fms $ ln -s /mnt/vol/mission.py .  # One-time setup.
-oper@fms $ ./mission.py
-```
 
 [1]: https://airshipproject.eu
 [2]: https://github.com/aslab/sys_self_mc
