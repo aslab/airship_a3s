@@ -35,7 +35,7 @@ oper@fms $ mkdir sims
 oper@fms $ cd sims
 oper@fms $ ros2 launch a3s mission_launch.py
 ```
-You should then see the logs of the simulation starting, the ardupilot initializing and the mission manager providing waypoints and commanding the drone to takeoff.
+You should then see the logs of the simulation starting, the ardupilot initializing and the mission manager providing waypoints and commanding the drone to takeoff. All the logs are stored in the default directory `~/.ros/log/`.
 
 
 [1]: https://airshipproject.eu

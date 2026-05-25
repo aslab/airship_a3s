@@ -3,7 +3,7 @@ import launch_ros
 
 # TODO: there seems to be an issue with the time syncronization
 # [mavros_node-4] [WARN] [mavros.time]: TM: Wrong FCU time.
-# [mavros_node-4] [INFO] [1776847366.752596278] [mavros.time]: TM: Timesync mode: MAVLINK
+# [mavros_node-4] [INFO] [mavros.time]: TM: Timesync mode: MAVLINK
 # [mavros_node-4] [WARN] [mavros.time]: TM: RTT too high for timesync: 19.27 ms.
 def generate_launch_description() -> launch.LaunchDescription:
     ardupilot_prefix = "/home/oper/fms/install/ardupilot_sitl/"
