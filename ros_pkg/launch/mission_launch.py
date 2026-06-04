@@ -23,16 +23,17 @@ def generate_launch_description() -> launch.LaunchDescription:
                 ),
                 launch_arguments={
                     "command": "arduplane",
-                    	"synthetic_clock": "True",
-	                "wipe": "False",
-	                "model": "plane",
-	                "speedup": "1",
-	                "slave": "0",
-	                "instance": "0",
-	                "defaults": default_params_paths,
-	                "sim_address": "127.0.0.1",
-	                "master": "tcp:127.0.0.1:5760",
-	                "sitl": "127.0.0.1:5501"
+                    "synthetic_clock": "True",
+                    "wipe": "False",
+                    "model": "plane",
+                    "speedup": "1",
+                    "slave": "0",
+                    "instance": "0",
+                    "defaults": default_params_paths,
+                    "sim_address": "127.0.0.1",
+                    "master": "tcp:127.0.0.1:5760",
+                    "sitl": "127.0.0.1:5501",
+                    "map": "True",
 	            }.items()
             ),
             launch.actions.IncludeLaunchDescription(

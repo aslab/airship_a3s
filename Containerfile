@@ -25,7 +25,7 @@ WORKDIR /home/$USERNAME/fms
 # Ardupilot setup.
 RUN vcs import --recursive --input \
     https://raw.githubusercontent.com/ArduPilot/ardupilot/master/Tools/ros2/ros2.repos src
-RUN AP_DOCKER_BUILD=1 SKIP_AP_EXT_ENV=1 SKIP_AP_GRAPHIC_ENV=1 SKIP_AP_COV_ENV=1 \
+RUN AP_DOCKER_BUILD=1 SKIP_AP_EXT_ENV=1 SKIP_AP_GRAPHIC_ENV=0 SKIP_AP_COV_ENV=1 \
     DO_AP_STM_ENV=0 USER=$USERNAME \
     src/ardupilot/Tools/environment_install/install-prereqs-ubuntu.sh -y
 RUN sudo rosdep init && rosdep update && rosdep install --from-paths src --ignore-src -r -y
