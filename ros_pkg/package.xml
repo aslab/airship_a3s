@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>a3s</name>
+  <name>a3sys</name>
   <version>0.0.0</version>
   <description>AIRSHIP Awareness, Anticipation and Adaptation System</description>
   <maintainer email="ln.pardi@upm.es">Leonardo N. Pardi</maintainer>
-  <license>GPL-3.0-only</license>
+  <license>BSD-3-clause</license>
 
   <exec_depend>ros2launch</exec_depend>
   <exec_depend>rclpy</exec_depend>

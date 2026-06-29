@@ -1,28 +1,8 @@
 #!/bin/sh
-USAGE="Usage: `basename $0` $DISPLAY $XDG_RUNTIME_DIR"
 
 trap "echo Terminate signal received. Exitting; exit" TERM
 
-if [ -z "$1" ]
-then
-  echo "Error: no DISPLAY value provided" 1>&2
-  echo $USAGE
-  exit 1
-fi
-
-if [ -z "$2" ]
-then
-  echo "Error: no XDG_RUNTIME_DIR value provided" 1>&2
-  echo $USAGE
-  exit 2
-fi
-
-echo "# Graphics setup
-export DISPLAY=$1
-export XDG_RUNTIME_DIR=$2" >> /home/oper/.bashrc
-echo 'export XAUTHORITY=`find $XDG_RUNTIME_DIR -name "*Xwaylandauth*"`' >> /home/oper/.bashrc
-
-ln -s /run/host/tmp/.X* /tmp
+[ ! -d /tmp/.X11-unix ] && ln -s /run/host/tmp/.X* /tmp
 
 echo "Container initialized"
 while true

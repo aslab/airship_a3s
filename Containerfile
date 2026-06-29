@@ -1,6 +1,10 @@
 FROM ros:humble-ros-core
 
 ARG USERNAME=oper
+# Set your graphical environment.
+ARG DISPLAY=:0
+ARG XDG_RUNTIME_DIR=/run/user/1000
+ARG XAUTHORITY="$XDG_RUNTIME_DIR/.mutter-Xwaylandauth*"
 
 RUN apt-get update && apt-get upgrade -y && apt-get install -y sudo
 COPY --chmod=755 initcnt /usr/bin
@@ -8,6 +12,11 @@ RUN useradd -m -s /bin/bash -G sudo $USERNAME && passwd -d $USERNAME
 RUN echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> /home/$USERNAME/.bashrc
 RUN echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${USERNAME}
 RUN chmod 0440 /etc/sudoers.d/${USERNAME}
+
+RUN echo "#Graphics setup." >> /home/$USERNAME/.bashrc
+RUN echo "export DISPLAY=$DISPLAY" >> /home/$USERNAME/.bashrc
+RUN echo "export XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR" >> /home/$USERNAME/.bashrc
+RUN echo "export XAUTHORITY=$XAUTHORITY" >> /home/$USERNAME/.bashrc
 
 # Ardupilot Build dependencies.
 RUN apt-get install -y git python3-colcon-core python3-colcon-bash python3-colcon-cmake \

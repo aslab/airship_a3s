@@ -51,7 +51,7 @@ def generate_launch_description() -> launch.LaunchDescription:
                 }.items()
             ),
             launch_ros.actions.Node(
-                package="a3s",
+                package="a3sys",
                 executable="mission",
             )
         ]

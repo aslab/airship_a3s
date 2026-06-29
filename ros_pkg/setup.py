@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'a3s'
+package_name = 'a3sys'
 
 setup(
     name=package_name,
@@ -17,7 +17,7 @@ setup(
     maintainer='Leonardo N. Pardi',
     maintainer_email='ln.pardi@upm.es',
     description='AIRSHIP Awareness, Anticipation and Adaptation System',
-    license='GPL-3.0-only',
+    license='BSD-3-clause',
     extras_require={
         'test': [
             'pytest',
@@ -25,7 +25,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'mission = a3s.mission:run'
+            'mission = a3sys.mission:run'
         ],
     },
 )
