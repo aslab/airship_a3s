@@ -11,12 +11,12 @@ import mavros_msgs.srv
 
 
 class MissionManager(rclpy.node.Node):
-    """Fixed-wing drone mission manager node"""
+    """Fixed-wing drone mission manager node."""
 
     def __init__(self):
         super().__init__("mission_manager")
 
-        # Service clients.        
+        # Service clients.
         self.set_home_client = self.create_client(
             mavros_msgs.srv.CommandHome,
             "/mavros/cmd/set_home"
@@ -38,7 +38,7 @@ class MissionManager(rclpy.node.Node):
         self.get_logger().info("MAVROS services availability confirmed.")
 
     def wait_for_services(self):
-        """Wait for the required MAVROS services to be available"""
+        """Wait for the required MAVROS services to be available."""
         for service in (
             self.set_home_client,
             self.set_mode_client,
@@ -77,7 +77,7 @@ class MissionManager(rclpy.node.Node):
         request = mavros_msgs.srv.SetMode.Request()
         request.custom_mode = mode
 
-        self.get_logger().info(f"Setting mode to {mode}...") 
+        self.get_logger().info(f"Setting mode to {mode}...")
         future = self.set_mode_client.call_async(request)
         rclpy.spin_until_future_complete(self, future)
 
@@ -92,23 +92,23 @@ class MissionManager(rclpy.node.Node):
     def clear_mission(self):
         """Clear all waypoints from the autopilot."""
         request = mavros_msgs.srv.WaypointClear.Request()
-        
+
         self.get_logger().info("Clearing all waypoints from autopilot...")
         future = self.clear_waypoints_client.call_async(request)
         rclpy.spin_until_future_complete(self, future)
 
-        result = future.result() 
+        result = future.result()
         if result is None:
             raise RuntimeError("WaypointClear service call failed")
         if result.success:
             self.get_logger().info("Mission cleared successfully.")
         else:
-            raise RuntimeError(f"Failed to clear mission.")
+            raise RuntimeError("Failed to clear mission.")
 
     def create_basic_mission(self) -> typing.List[mavros_msgs.msg.Waypoint]:
-        """Creates a basic mission: Home, takeoff, loiter"""
+        """Creates a basic mission: Home, takeoff, loiter."""
         waypoints = []
-        
+
         # Waypoint 0: Home position (required).
         waypoint = mavros_msgs.msg.Waypoint()
         waypoint.frame = 0  # MAV_FRAME_GLOBAL.
@@ -142,7 +142,7 @@ class MissionManager(rclpy.node.Node):
         waypoint.y_long = 149.164735
         waypoint.z_alt = 623.5
         waypoints.append(waypoint)
-        
+
         return waypoints
 
     def push_mission(self, mission: typing.List[mavros_msgs.msg.Waypoint]):
@@ -150,7 +150,7 @@ class MissionManager(rclpy.node.Node):
         request = mavros_msgs.srv.WaypointPush.Request()
         request.start_index = 0
         request.waypoints = mission
-        
+
         self.get_logger().info(f"Pushing {len(mission)} waypoints to autopilot...")
         future = self.waypoint_push_client.call_async(request)
         rclpy.spin_until_future_complete(self, future, timeout_sec=5.0)
@@ -163,13 +163,13 @@ class MissionManager(rclpy.node.Node):
                 f"{future.result().wp_transfered} mission waypoints succesfully pushed."
             )
         else:
-            raise RuntimeError(f"Failed to push mission.")
+            raise RuntimeError("Failed to push mission.")
 
     def arm(self):
         request = mavros_msgs.srv.CommandBool.Request()
         request.value = True
 
-        self.get_logger().info(f"Arming drone...")
+        self.get_logger().info("Arming drone...")
         future = self.arming_client.call_async(request)
         rclpy.spin_until_future_complete(self, future)
 
@@ -179,7 +179,7 @@ class MissionManager(rclpy.node.Node):
         if result.success:
             self.get_logger().info("Drone armed succesfully.")
         else:
-            raise RuntimeError(f"Failed to arm the drone.")
+            raise RuntimeError("Failed to arm the drone.")
 
 
 def run():
@@ -214,7 +214,7 @@ def run():
         mission_manager.get_logger().error(f"An error occurred: {e}")
     finally:
         mission_manager.destroy_node()
-        #rclpy.shutdown()
+
 
 if __name__ == '__main__':
     run()

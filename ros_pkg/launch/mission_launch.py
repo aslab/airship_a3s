@@ -1,6 +1,7 @@
 import launch
 import launch_ros
 
+
 # TODO: there seems to be an issue with the time syncronization
 # [mavros_node-4] [WARN] [mavros.time]: TM: Wrong FCU time.
 # [mavros_node-4] [INFO] [mavros.time]: TM: Timesync mode: MAVLINK
@@ -34,7 +35,7 @@ def generate_launch_description() -> launch.LaunchDescription:
                     "master": "tcp:127.0.0.1:5760",
                     "sitl": "127.0.0.1:5501",
                     "map": "True",
-	            }.items()
+                }.items()
             ),
             launch.actions.IncludeLaunchDescription(
                 launch.substitutions.PathJoinSubstitution(
@@ -56,4 +57,3 @@ def generate_launch_description() -> launch.LaunchDescription:
             )
         ]
     )
-
