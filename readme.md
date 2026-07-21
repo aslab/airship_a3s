@@ -36,6 +36,10 @@ oper@fms $ ros2 launch a3sys mission_launch.py
 ```
 You should then see the logs of the simulation starting, the ardupilot initializing and the mission manager providing waypoints and commanding the drone to takeoff. All the logs are stored in the default directory `~/.ros/log/`. Also a map with the aircraft taking off should appear.
 
+MissionPlanner
+--------------
+If you want to connect to the simulated drone with the Ground Control Station software Mission Planner you need to select in the top right corner UDP connection to `127.0.0.1:14550`.
+
 Troubleshooting
 ---------------
 Should you have a problem running a GUI inside the container with "Authorization required, but no authorization protocol specified" error, then you should extend the X permission in the host with the following command.

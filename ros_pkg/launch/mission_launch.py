@@ -2,14 +2,11 @@ import launch
 import launch_ros
 
 
-# TODO: there seems to be an issue with the time syncronization
-# [mavros_node-4] [WARN] [mavros.time]: TM: Wrong FCU time.
-# [mavros_node-4] [INFO] [mavros.time]: TM: Timesync mode: MAVLINK
-# [mavros_node-4] [WARN] [mavros.time]: TM: RTT too high for timesync: 19.27 ms.
 def generate_launch_description() -> launch.LaunchDescription:
-    ardupilot_prefix = "/home/oper/fms/install/ardupilot_sitl/"
-    plane_params = ardupilot_prefix + "share/ardupilot_sitl/config/models/plane.parm"
-    dds_params = ardupilot_prefix + "share/ardupilot_sitl/config/default_params/dds_udp.parm"
+    fms_prefix = "/home/oper/fms/install/"
+    ardupilot_prefix = fms_prefix + "ardupilot_sitl/share/ardupilot_sitl/config/"
+    plane_params = ardupilot_prefix + "models/plane.parm"
+    dds_params = ardupilot_prefix + "default_params/dds_udp.parm"
     default_params_paths = plane_params + "," + dds_params
 
     return launch.LaunchDescription(
@@ -42,13 +39,16 @@ def generate_launch_description() -> launch.LaunchDescription:
                         [
                             launch_ros.substitutions.FindPackageShare("mavros"),
                             "launch",
-                            "apm.launch"
+                            "node.launch"
                         ]
                 ),
                 launch_arguments={
                     "fcu_url": "udp://0.0.0.0:14550@",
-                    "config_yaml": "apm_config.yaml",
-                    "pluginlists_yaml": "apm_pluginlists.yaml"
+                    "gcs_url": "",
+                    "tgt_system": "1",
+                    "tgt_component": "1",
+                    "pluginlists_yaml": "apm_pluginlists.yaml",
+                    "config_yaml": fms_prefix + "/a3sys/share/a3sys/apm_config.yaml",
                 }.items()
             ),
             launch_ros.actions.Node(
